@@ -3,7 +3,7 @@ var express      = require('express');
 var path         = require('path');
 var cookieParser = require('cookie-parser');
 var logger       = require('morgan');
-var session      = require('express-session')
+var session      = require('express-session');
 
 const auth           = require('./auth/auth');
 var indexRouter      = require('./routes/index');
@@ -14,12 +14,28 @@ var projectsRouter   = require('./routes/projects');
 
 var app = express();
 
+var RedisStore = require('connect-redis')(session);
+var store      = new RedisStore({
+  port: 6379,          // Redis port
+  host: 'redis',   // Redis host
+  pass: 'admin',
+  db  : 8
+});
+
 app.use(session({
-  secret           : 'about_oa',
-  resave           : true,
-  saveUninitialized: true,
-  cookie           : {maxAge: 6000000}//100 min
+  store : store,
+  secret: 'about_oa',
+  resave: false,
+  cookie: {maxAge: 600000}//10 min
+  // cookie: {maxAge: 30000}//10 min test for session reschedule!
 }));
+
+// app.use(session({
+//   secret           : 'about_oa',
+//   resave           : true,
+//   saveUninitialized: true,
+//   cookie           : {maxAge: 6000000}//100 min
+// }));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -35,9 +51,9 @@ app.use(express.static(path.join(__dirname, 'dist')));
 
 app.use('/', indexRouter);
 app.use('/api/v1/', auth.checkFrequency, usersRouter);
-app.use('/api/v1/', logsRouter);
-app.use('/api/v1/', categoriesRouter);
-app.use('/api/v1/', projectsRouter);
+// app.use('/api/v1/', logsRouter);
+// app.use('/api/v1/', categoriesRouter);
+// app.use('/api/v1/', projectsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -22,13 +22,15 @@ app.set('port', port);
 var server = http.createServer(app);
 
 function modelAssociate() {
-  db.Category.hasMany(db.Project, {
-    foreignKey: 'categoryId',
-    sourceKey : 'id'
+  db.Plan.belongsToMany(db.Spot, {
+    through   : db.PlanSpot,
+    foreignKey: 'planId',
+    otherKey  : 'spotId'
   });
-  db.Project.belongsTo(db.Category, {
-    foreignKey: 'categoryId',
-    targetKey : 'id'
+  db.Spot.belongsToMany(db.Plan, {
+    through   : db.PlanSpot,
+    foreignKey: 'spotId',
+    otherKey  : 'planId'
   });
 }
 

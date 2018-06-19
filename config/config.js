@@ -10,7 +10,7 @@ module.exports = {
     production: {
         username: process.env.DB_USERNAME || 'root',
         password: process.env.DB_PASSWORD || 'admin',
-        database: process.env.DB_NAME || 'aboutoa',
+        database: process.env.DB_NAME || 'travelmap',
         host: process.env.DB_HOSTNAME || 'mysql',
         port: process.env.DB_PORT || 3306,
         dialect: 'mysql',

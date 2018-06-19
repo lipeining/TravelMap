@@ -1,1 +1,1 @@
-create database `aboutoa` default character set utf8mb4 collate utf8mb4_unicode_ci;
+create database `travelmap` default character set utf8mb4 collate utf8mb4_unicode_ci;
