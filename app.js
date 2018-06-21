@@ -5,12 +5,12 @@ var cookieParser = require('cookie-parser');
 var logger       = require('morgan');
 var session      = require('express-session');
 
-const auth           = require('./auth/auth');
-var indexRouter      = require('./routes/index');
-var usersRouter      = require('./routes/users');
-var logsRouter       = require('./routes/logs');
-var categoriesRouter = require('./routes/categories');
-var projectsRouter   = require('./routes/projects');
+const auth         = require('./auth/auth');
+var indexRouter    = require('./routes/index');
+var usersRouter    = require('./routes/users');
+var logsRouter     = require('./routes/logs');
+var plansRouter    = require('./routes/plans');
+var projectsRouter = require('./routes/projects');
 
 var app = express();
 
@@ -26,7 +26,7 @@ app.use(session({
   store : store,
   secret: 'about_oa',
   resave: false,
-  cookie: {maxAge: 600000}//10 min
+  cookie: {maxAge: 6000000}//100 min
   // cookie: {maxAge: 30000}//10 min test for session reschedule!
 }));
 
@@ -50,9 +50,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'dist')));
 
 app.use('/', indexRouter);
-app.use('/api/v1/', auth.checkFrequency, usersRouter);
+app.use('/api/v1/', usersRouter);
 // app.use('/api/v1/', logsRouter);
-// app.use('/api/v1/', categoriesRouter);
+app.use('/api/v1/', plansRouter);
 // app.use('/api/v1/', projectsRouter);
 
 // catch 404 and forward to error handler

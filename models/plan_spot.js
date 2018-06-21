@@ -1,7 +1,7 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const PlanSpot = sequelize.define('PlanSpot', {
-    id    : {
+    id     : {
       type         : DataTypes.INTEGER(11),
       field        : 'id',
       primaryKey   : true,
@@ -9,28 +9,49 @@ module.exports = (sequelize, DataTypes) => {
       allowNull    : false,
       comment      : 'PlanSpot id'
     },
-    planId: {
+    planId : {
       type        : DataTypes.INTEGER(11),
       field       : 'plan_id',
       defaultValue: 0,
       allowNull   : false,
       comment     : 'plan id'
     },
-    spotId: {
+    spotId : {
       type        : DataTypes.INTEGER(11),
       field       : 'spot_id',
       defaultValue: 0,
       allowNull   : false,
       comment     : 'spot id'
     },
-    order : {
+    userId : {
+      type        : DataTypes.INTEGER(11),
+      field       : 'user_id',
+      defaultValue: 0,
+      allowNull   : false,
+      comment     : 'user id'
+    },
+    groupId: {
+      type        : DataTypes.INTEGER(11),
+      field       : 'group_id',
+      defaultValue: 0,
+      allowNull   : false,
+      comment     : 'group id'
+    },
+    order  : {
       type        : DataTypes.INTEGER(11),
       field       : 'order',
       defaultValue: 0,
       allowNull   : false,
-      comment     : 'PlanSpot order'
+      comment     : 'Spot order'
     },
-    status: {
+    type   : {
+      type        : DataTypes.INTEGER(11),
+      field       : 'type',
+      defaultValue: 0,
+      allowNull   : false,
+      comment     : 'PlanSpot type'
+    },
+    status : {
       type        : DataTypes.INTEGER(11),
       field       : 'status',
       defaultValue: 0,

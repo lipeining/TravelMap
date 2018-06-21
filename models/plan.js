@@ -23,20 +23,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull   : false,
       comment     : 'Plan introduction'
     },
-    userId   : {
-      type        : DataTypes.INTEGER(11),
-      field       : 'user_id',
-      defaultValue: 0,
-      allowNull   : false,
-      comment     : 'user id'
-    },
-    order    : {
-      type        : DataTypes.INTEGER(11),
-      field       : 'order',
-      defaultValue: 0,
-      allowNull   : false,
-      comment     : 'Plan order'
-    },
     cost     : {
       type        : DataTypes.INTEGER(11),
       field       : 'cost',
@@ -72,6 +58,11 @@ module.exports = (sequelize, DataTypes) => {
       through   : models.PlanSpot,
       foreignKey: 'planId',
       otherKey  : 'spotId'
+    });
+    models.Plan.belongsToMany(models.User, {
+      through   : models.UserPlan,
+      foreignKey: 'planId',
+      otherKey  : 'userId'
     });
   };
 

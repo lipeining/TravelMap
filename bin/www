@@ -32,6 +32,26 @@ function modelAssociate() {
     foreignKey: 'spotId',
     otherKey  : 'planId'
   });
+  db.Plan.belongsToMany(db.User, {
+    through   : db.UserPlan,
+    foreignKey: 'planId',
+    otherKey  : 'userId'
+  });
+  db.User.belongsToMany(db.Plan, {
+    through   : db.UserPlan,
+    foreignKey: 'userId',
+    otherKey  : 'planId'
+  });
+  db.Group.belongsToMany(db.User, {
+    through   : db.UserGroup,
+    foreignKey: 'groupId',
+    otherKey  : 'userId'
+  });
+  db.User.belongsToMany(db.Group, {
+    through   : db.UserGroup,
+    foreignKey: 'userId',
+    otherKey  : 'groupId'
+  });
 }
 
 /**

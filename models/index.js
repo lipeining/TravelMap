@@ -9,25 +9,26 @@ const config    = require(__dirname + '/../config/config.js')[env];
 const db        = {};
 
 if (config.use_env_variable) {
-    var sequelize = new Sequelize(process.env[config.use_env_variable], config);
+  var sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
-    var sequelize = new Sequelize(config.database, config.username, config.password, config);
+  var sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 
 fs
-    .readdirSync(__dirname)
-    .filter(file => {
-        return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
-    })
-    .forEach(file => {
-        let model = sequelize['import'](path.join(__dirname, file));
-        db[model.name] = model;
-    });
+  .readdirSync(__dirname)
+  .filter(file => {
+    return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
+  })
+  .forEach(file => {
+    let model      = sequelize['import'](path.join(__dirname, file));
+    db[model.name] = model;
+  });
 
 Object.keys(db).forEach(modelName => {
-    if (db[modelName].associate) {
-        db[modelName].associate(db);
-    }
+  if (db[modelName].associate) {
+    // console.log(`${modelName} associate function!`);
+    db[modelName].associate(db);
+  }
 });
 
 db.sequelize = sequelize;

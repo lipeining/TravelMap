@@ -10,9 +10,12 @@ const path        = require('path');
 const _     = require('lodash');
 const redis = require('../../../redis');
 
+const {validationResult} = require('express-validator/check');
+
 module.exports = {
   makeUsers,
   getUsers,
+  getUserNames,
   getUser,
   grantUser,
   login,
@@ -25,6 +28,11 @@ module.exports = {
 };
 
 async function getUsers(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({Message: {err: errors.array()}, code: 4});
+  }
+
   let pageIndex = parseInt(req.query.pageIndex) || 1;
   let pageSize  = parseInt(req.query.pageSize) || 10;
   let options   = {
@@ -41,7 +49,31 @@ async function getUsers(req, res, next) {
   }
 }
 
+async function getUserNames(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({Message: {err: errors.array()}, code: 4});
+  }
+
+  let options = {
+    search: req.query.search || '',
+    id    : req.session.user.id
+  };
+  try {
+    let userNames = await userService.getUserNames(options);
+    return res.json({Message: {userNames: userNames}, code: 0});
+  } catch (err) {
+    console.log(err);
+    return res.json({Message: {err: err}, code: 4});
+  }
+}
+
 async function getUser(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({Message: {err: errors.array()}, code: 4});
+  }
+
   let options = {
     id: parseInt(req.query.id) || 0
   };
@@ -68,6 +100,10 @@ async function login(req, res, next) {
   //   });
   //   await redis.set("users", JSON.stringify(users), "EX", "1800");
   // }
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({Message: {err: errors.array()}, code: 4});
+  }
 
   let options = {
     password: req.body.password || '',
@@ -83,7 +119,7 @@ async function login(req, res, next) {
   count           = parseInt(count) || 0;
   let captchaCode = req.body.code || '';
   let now         = Date.now();
-  console.log(`count is ${count}`);
+  console.log(`try login count is ${count}`);
   if (count > now) {
     let time = ((count - now) / 1000 / 60 / 60).toFixed(3);
     return res.json({Message: {err: `the user has try more than 5 times, try after ${time} hours`}, code: 4});
@@ -130,6 +166,11 @@ async function login(req, res, next) {
 }
 
 async function reg(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({Message: {err: errors.array()}, code: 4});
+  }
+
   console.log(`request ip:${req.ip}`);
   console.log(`request ips:${req.ips}`);
   let ipReg    = `${req.ip}-reg`;
@@ -188,6 +229,11 @@ async function makeUsers(req, res, next) {
 }
 
 async function update(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({Message: {err: errors.array()}, code: 4});
+  }
+
   let user = {
     id   : parseInt(req.body.id) || 0,
     phone: parseInt(req.body.phone) || 0,
@@ -197,7 +243,7 @@ async function update(req, res, next) {
   };
   try {
     let count = await userService.update(user);
-    console.log('count is:' + count);
+    console.log('update return count is:' + count);
     if (count) {
       return res.json({code: 0, Message: {}});
     } else {
@@ -225,11 +271,11 @@ async function grantUser(req, res, next) {
     };
     if (count) {
       log['success'] = 1;
-      logService.insertLog(log);
+      // logService.insertLog(log);
       return res.json({code: 0});
     } else {
       log['success'] = 0;
-      logService.insertLog(log);
+      // logService.insertLog(log);
       return res.json({Message: {err: 'wrong input'}, code: 4});
     }
   } catch (err) {
@@ -239,6 +285,11 @@ async function grantUser(req, res, next) {
 }
 
 async function delUser(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({Message: {err: errors.array()}, code: 4});
+  }
+
   let options = {
     id: parseInt(req.body.id) || 0
   };
@@ -252,11 +303,11 @@ async function delUser(req, res, next) {
     let count = await userService.delUser(options);
     if (count) {
       log['success'] = 1;
-      logService.insertLog(log);
+      // logService.insertLog(log);
       return res.json({code: 0});
     } else {
       log['success'] = 0;
-      logService.insertLog(log);
+      // logService.insertLog(log);
       return res.json({Message: {err: 'wrong id'}, code: 4});
     }
   } catch (err) {
@@ -266,7 +317,8 @@ async function delUser(req, res, next) {
 }
 
 async function logout(req, res, next) {
-  req.session.user = null;
+  // fixme i can delete the captcha image in the redis reschedule callback function!
+  req.session.destroy();
   return res.json({code: 0});
 }
 

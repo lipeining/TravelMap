@@ -67,7 +67,17 @@ module.exports = (sequelize, DataTypes) => {
     });
 
   User.associate = function (models) {
-    // models.User.hasMany(models.Task);
+    //
+    models.User.belongsToMany(models.Plan, {
+      through   : models.UserPlan,
+      foreignKey: 'userId',
+      otherKey  : 'planId'
+    });
+    models.User.belongsToMany(models.Group, {
+      through   : models.UserGroup,
+      foreignKey: 'userId',
+      otherKey  : 'groupId'
+    });
   };
 
   return User;

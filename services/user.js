@@ -1,10 +1,11 @@
 const db     = require('../models');
 const crypto = require('crypto');
-const hmac   = crypto.createHmac('sha256', 'about oa');
+const hmac   = crypto.createHmac('sha256', 'travel map');
 
 module.exports = {
   makeUsers,
   getUsers,
+  getUserNames,
   getUser,
   grantUser,
   login,
@@ -46,6 +47,25 @@ async function getUsers(options) {
     attributes: ['id', 'name', 'email', 'phone', 'permission', 'intro'],
     offset    : (options.pageIndex - 1) * options.pageSize,
     limit     : options.pageSize,
+    order     : [["id", "ASC"]]
+  });
+}
+
+async function getUserNames(options) {
+  // do not get the user himself
+  let whereUser = {
+    id: {
+      [db.Sequelize.Op.ne]: options.id
+    }
+  };
+  if (options.search) {
+    whereUser.name = {
+      [db.Sequelize.Op.like]: '%' + options.search + '%'
+    };
+  }
+  return await db.User.findAll({
+    where     : whereUser,
+    attributes: ['id', 'name'],
     order     : [["id", "ASC"]]
   });
 }
