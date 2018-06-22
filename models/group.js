@@ -16,13 +16,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull   : false,
       comment     : 'Group name'
     },
-    userId: {
-      type        : DataTypes.INTEGER(11),
-      field       : 'user_id',
-      defaultValue: 0,
-      allowNull   : false,
-      comment     : 'Group user creator'
-    },
     number: {
       type        : DataTypes.INTEGER(11),
       field       : 'number',
@@ -40,11 +33,17 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Group.associate = function (models) {
-    //  TODO add group and plan middle table!
+    //   add group and plan middle table!
     models.Group.belongsToMany(models.User, {
       through   : models.UserGroup,
       foreignKey: 'groupId',
       otherKey  : 'userId'
+    });
+
+    models.Group.belongsToMany(models.Plan, {
+      through   : models.GroupPlan,
+      foreignKey: 'groupId',
+      otherKey  : 'planId'
     });
   };
 

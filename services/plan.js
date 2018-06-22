@@ -46,7 +46,11 @@ async function getPlans(options) {
     where: {id: options.userId}
   });
   // console.log(util.inspect(user, {depth: 4, color: true}));
-  return await user.getPlans({
+
+  // use count to get the total number!
+  let total = await user.countPlans({});
+
+  let plans = await user.getPlans({
     where              : wherePlan,
     raw                : true,
     through            : {
@@ -60,6 +64,7 @@ async function getPlans(options) {
     limit              : options.pageSize,
     order              : [["id", "DESC"]]
   });
+  return [plans, total];
   // return await db.Plan.findAndCountAll({
   //   attributes: ['id', 'name', 'intro', 'cost', 'status', 'startTime', 'endTime'],
   //   // required  : false,
@@ -178,7 +183,7 @@ async function getPlanUsers(options) {
   let whereUserPlan = {
     planId: options.planId
   };
-  let userIds   = await db.UserPlan.findAll({
+  let userIds       = await db.UserPlan.findAll({
     where     : whereUserPlan,
     attributes: ['userId'],
     raw       : true
@@ -186,7 +191,7 @@ async function getPlanUsers(options) {
     return UserPlan.userId;
   });
   // console.log(userIds);
-  let whereUser = {};
+  let whereUser     = {};
   if (options.inOut) {
     // find the user in the plan
     whereUser['id'] = {

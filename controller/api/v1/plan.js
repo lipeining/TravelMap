@@ -35,9 +35,9 @@ async function getPlans(req, res, next) {
   }
   try {
     // by now user just get the plans created by  himself!
-    options['userId'] = req.session.user.id;
-    let plans         = await planService.getPlans(options);
-    return res.json({Message: {plans: plans}, code: 0});
+    options['userId']  = req.session.user.id;
+    let [plans, total] = await planService.getPlans(options);
+    return res.json({Message: {plans: plans, total: total}, code: 0});
   } catch (err) {
     console.log(err);
     return res.json({Message: {err: err}, code: 4});

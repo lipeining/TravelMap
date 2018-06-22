@@ -64,6 +64,11 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'planId',
       otherKey  : 'userId'
     });
+    models.Plan.belongsToMany(models.Group, {
+      through   : models.GroupPlan,
+      foreignKey: 'planId',
+      otherKey  : 'groupId'
+    });
   };
 
   return Plan;

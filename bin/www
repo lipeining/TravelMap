@@ -47,9 +47,19 @@ function modelAssociate() {
     foreignKey: 'groupId',
     otherKey  : 'userId'
   });
+  db.Group.belongsToMany(db.Plan, {
+    through   : db.GroupPlan,
+    foreignKey: 'groupId',
+    otherKey  : 'planId'
+  });
   db.User.belongsToMany(db.Group, {
     through   : db.UserGroup,
     foreignKey: 'userId',
+    otherKey  : 'groupId'
+  });
+  db.Plan.belongsToMany(db.Group, {
+    through   : db.GroupPlan,
+    foreignKey: 'planId',
     otherKey  : 'groupId'
   });
 }
