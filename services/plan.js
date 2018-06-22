@@ -4,6 +4,7 @@ const util      = require('util');
 
 module.exports = {
   getPlans,
+  getPlanUsers,
   getPlan,
   createPlan,
   updatePlan,
@@ -11,6 +12,7 @@ module.exports = {
   delPlan,
   addUser,
   setUser,
+  removeUser,
 };
 
 async function getPlans(options) {
@@ -165,55 +167,138 @@ async function updatePlans(Plans) {
 
 async function delPlan(Plan) {
   // not really delete the plan!
-  return await db.Plan.update(
-    {
-      status: 1
-    }, {
-      where: {id: Plan.id}
-    });
+  return await db.Plan.update({
+    status: 1
+  }, {
+    where: {id: Plan.id}
+  });
+}
+
+async function getPlanUsers(options) {
+  let whereUserPlan = {
+    planId: options.planId
+  };
+  let userIds   = await db.UserPlan.findAll({
+    where     : whereUserPlan,
+    attributes: ['userId'],
+    raw       : true
+  }).map(function (UserPlan) {
+    return UserPlan.userId;
+  });
+  // console.log(userIds);
+  let whereUser = {};
+  if (options.inOut) {
+    // find the user in the plan
+    whereUser['id'] = {
+      [db.Sequelize.Op.in]: userIds,
+    };
+  } else {
+    // find the user not in the plan
+    whereUser['id'] = {
+      [db.Sequelize.Op.notIn]: userIds
+    };
+  }
+  return await db.User.findAll({
+    attributes: ['id', 'name'],
+    raw       : true,
+    where     : whereUser
+  });
 }
 
 async function addUser(user, options) {
-  // 1.check the user permission todo
+  // 1.check the user permission
   // 2.check type?
-  // 3.get the userId (todo we can change it into array)
+  // 3.get the userId (we can change it into array)
   // 4.use plan instance addUsers to add association!
 
   // user is optional , we can just use id!
   // let added = await db.User.findOne({
   //   where: {id: options.userId}
   // });
-  let plan = await db.Plan.findOne({
-    where: {id: options.id}
-  });
-  return await plan.addUsers(options.userIds, {
-    through: {
-      type  : options.type,
-      status: options.status,
-      // order : options.order, // by now , we ignore the order! todo
-    }
-  });
+  let permission = await checkPlanOwner({
+    userId: user.id,
+    planId: options.id
+  }) || {};
+  if (permission.id) {
+    let plan = await db.Plan.findOne({
+      where: {id: options.id}
+    });
+    return await plan.addUsers(options.userIds, {
+      through: {
+        type  : options.type,
+        status: options.status,
+        // order : options.order, // by now , we ignore the order! todo
+      }
+    });
+  } else {
+    return Promise.reject('no permission to add user to this plan');
+  }
 }
 
 async function setUser(user, options) {
-  // 1.check the user permission todo
+  // 1.check the user permission
   // 2.check type?
-  // 3.get the userId (todo we can change it into array)
+  // 3.get the userId (we can change it into array)
   // 4.use plan instance addUsers to add association!
 
   // user is optional , we can just use id!
   // let added = await db.User.findOne({
   //   where: {id: options.userId}
   // });
-  let plan = await db.Plan.findOne({
-    where: {id: options.id}
-  });
-  // still use addUsers to update the type and status
-  return await plan.addUsers(options.userIds, {
-    through: {
-      type  : options.type,
-      status: options.status,
-      // order : options.order, // by now , we ignore the order! todo
-    }
+  let permission = await checkPlanOwner({
+    userId: user.id,
+    planId: options.id
+  }) || {};
+  if (permission.id) {
+    let plan = await db.Plan.findOne({
+      where: {id: options.id}
+    });
+    // still use addUsers to update the type and status
+    return await plan.addUsers([options.userId], {
+      through: {
+        type  : options.type,
+        status: options.status,
+        // order : options.order, // by now , we ignore the order! todo
+      }
+    });
+  } else {
+    return Promise.reject('no permission to set the user of this plan');
+  }
+}
+
+async function removeUser(user, options) {
+  // 1.check the user permission
+  // 2.check type?
+  // 3.use plan instance removeUsers to delete association!
+
+  // user is optional , we can just use id!
+  // let added = await db.User.findOne({
+  //   where: {id: options.userId}
+  // });
+  let permission = await checkPlanOwner({
+    userId: user.id,
+    planId: options.id
+  }) || {};
+  if (permission.id) {
+    let plan = await db.Plan.findOne({
+      where: {id: options.id}
+    });
+    // still use addUsers to update the type and status
+    return await plan.removeUsers([options.userId]);
+  } else {
+    return Promise.reject('no permission to remove the user of this plan');
+  }
+}
+
+async function checkPlanOwner(options) {
+  return await db.UserPlan.findOne({
+    where     : {
+      userId: options.userId,
+      planId: options.planId,
+      type  : 0,
+      // status: 0,
+    },
+    attributes: ['id'],
+    raw       : true
   });
 }

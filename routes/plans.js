@@ -76,6 +76,21 @@ router.post('/plan', auth.checkLogin,
     }
   }), planCtrl.createPlan);
 
+//  Plan remove user
+router.get('/planusers', auth.checkLogin,
+  checkSchema({
+    inOut : {
+      in   : ['query'],
+      isInt: true,
+      toInt: true
+    },
+    planId: {
+      in   : ['query'],
+      isInt: true,
+      toInt: true,
+    }
+  }), planCtrl.getPlanUsers);
+
 //  Plan add user
 router.post('/planuser', auth.checkLogin,
   checkSchema({
@@ -99,6 +114,46 @@ router.post('/planuser', auth.checkLogin,
       toInt: true
     }
   }), planCtrl.addUser);
+
+//  Plan edit user
+router.put('/planuser', auth.checkLogin,
+  checkSchema({
+    id    : {
+      in   : ['body'],
+      isInt: true,
+      toInt: true
+    },
+    userId: {
+      in   : ['body'],
+      isInt: true,
+      toInt: true,
+    },
+    status: {
+      in   : ['body'],
+      isInt: true,
+      toInt: true
+    },
+    type  : {
+      in   : ['body'],
+      isInt: true,
+      toInt: true
+    }
+  }), planCtrl.setUser);
+
+//  Plan remove user
+router.delete('/planuser', auth.checkLogin,
+  checkSchema({
+    id    : {
+      in   : ['body'],
+      isInt: true,
+      toInt: true
+    },
+    userId: {
+      in   : ['body'],
+      isInt: true,
+      toInt: true,
+    }
+  }), planCtrl.removeUser);
 
 // update Plan
 router.put('/plan', auth.checkLogin,

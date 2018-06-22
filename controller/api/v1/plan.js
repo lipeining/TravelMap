@@ -7,12 +7,15 @@ const {validationResult} = require('express-validator/check');
 
 module.exports = {
   getPlans,
+  getPlanUsers,
   getPlan,
   createPlan,
   updatePlan,
   updatePlans,
   delPlan,
-  addUser
+  addUser,
+  setUser,
+  removeUser,
 };
 
 async function getPlans(req, res, next) {
@@ -55,6 +58,26 @@ async function getPlan(req, res, next) {
     let [plan, Users, Spots] = await planService.getPlan(options);
     // console.log(plan);
     return res.json({Message: {plan: plan, Users: Users, Spots: Spots}, code: 0});
+  } catch (err) {
+    console.log(err);
+    return res.json({Message: {err: err}, code: 4});
+  }
+}
+
+async function getPlanUsers(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({Message: {err: errors.array()}, code: 4});
+  }
+
+  // get the user names which is in this plan or not through inOut
+  let options = {
+    planId: parseInt(req.query.planId) || 0,
+    inOut : parseInt(req.query.inOut) || 0,
+  };
+  try {
+    let userNames = await planService.getPlanUsers(options);
+    return res.json({Message: {userNames: userNames}, code: 0});
   } catch (err) {
     console.log(err);
     return res.json({Message: {err: err}, code: 4});
@@ -213,6 +236,50 @@ async function addUser(req, res, next) {
     // (todo we can change userId into array)
     let user   = req.session.user;
     let result = await planService.addUser(user, options);
+    return res.json({code: 0, Message: {}});
+  } catch (err) {
+    console.log(err);
+    return res.json({Message: {err: err}, code: 4});
+  }
+}
+
+async function setUser(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({Message: {err: errors.array()}, code: 4});
+  }
+
+  let options = {
+    id    : parseInt(req.body.id) || 0,
+    userId: parseInt(req.body.userId) || 0,
+    type  : parseInt(req.body.type) || 0,
+    status: parseInt(req.body.status) || 0,
+  };
+  try {
+    // (todo we can change userId into array)
+    let user   = req.session.user;
+    let result = await planService.setUser(user, options);
+    return res.json({code: 0, Message: {}});
+  } catch (err) {
+    console.log(err);
+    return res.json({Message: {err: err}, code: 4});
+  }
+}
+
+async function removeUser(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({Message: {err: errors.array()}, code: 4});
+  }
+
+  let options = {
+    id    : parseInt(req.body.id) || 0,
+    userId: parseInt(req.body.userId) || 0,
+  };
+  try {
+    // (todo we can change userId into array)
+    let user   = req.session.user;
+    let result = await planService.removeUser(user, options);
     return res.json({code: 0, Message: {}});
   } catch (err) {
     console.log(err);
