@@ -16,13 +16,10 @@ module.exports = {
   addUser,
   setUser,
   removeUser,
-<<<<<<< HEAD
   addGroup,
   setGroup,
   removeGroup,
   getPlanGroups,
-=======
->>>>>>> f7b67b92e950716c5803499b8260369e16da6924
 };
 
 async function getPlans(req, res, next) {
@@ -61,8 +58,7 @@ async function getPlan(req, res, next) {
     id: parseInt(req.query.id) || 0
   };
   try {
-    // should we check the permission?
-<<<<<<< HEAD
+
     let [plan, Users, Spots, Groups] = await planService.getPlan(options);
     // console.log(plan);
     return res.json({
@@ -71,11 +67,6 @@ async function getPlan(req, res, next) {
         Spots: Spots, Groups: Groups
       }, code: 0
     });
-=======
-    let [plan, Users, Spots] = await planService.getPlan(options);
-    // console.log(plan);
-    return res.json({Message: {plan: plan, Users: Users, Spots: Spots}, code: 0});
->>>>>>> f7b67b92e950716c5803499b8260369e16da6924
   } catch (err) {
     console.log(err);
     return res.json({Message: {err: err}, code: 4});
@@ -304,7 +295,6 @@ async function removeUser(req, res, next) {
     return res.json({Message: {err: err}, code: 4});
   }
 }
-<<<<<<< HEAD
 
 async function getPlanGroups(req, res, next) {
   const errors = validationResult(req);
@@ -394,5 +384,3 @@ async function removeGroup(req, res, next) {
     return res.json({Message: {err: err}, code: 4});
   }
 }
-=======
->>>>>>> f7b67b92e950716c5803499b8260369e16da6924
