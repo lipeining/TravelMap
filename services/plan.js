@@ -13,13 +13,10 @@ module.exports = {
   addUser,
   setUser,
   removeUser,
-<<<<<<< HEAD
   getPlanGroups,
   addGroup,
   setGroup,
   removeGroup,
-=======
->>>>>>> f7b67b92e950716c5803499b8260369e16da6924
 };
 
 async function getPlans(options) {
@@ -92,27 +89,17 @@ async function getPlans(options) {
 }
 
 async function getPlan(options) {
-<<<<<<< HEAD
-  let plan   = await db.Plan.findOne({
-    where: options
-  });
-  let Spots  = await plan.getSpots({
-=======
   let plan  = await db.Plan.findOne({
     where: options
   });
   let Spots = await plan.getSpots({
->>>>>>> f7b67b92e950716c5803499b8260369e16da6924
     raw    : true,
     through: {
       attributes: ['order', 'status', 'type']
     }
   });
-<<<<<<< HEAD
-  let Users  = await plan.getUsers({
-=======
+
   let Users = await plan.getUsers({
->>>>>>> f7b67b92e950716c5803499b8260369e16da6924
     raw       : true,
     attributes: {
       exclude: ['password']
@@ -121,7 +108,7 @@ async function getPlan(options) {
       attributes: ['order', 'status', 'type']
     }
   });
-<<<<<<< HEAD
+
   let Groups = await plan.getGroups({
     raw    : true,
     through: {
@@ -129,9 +116,7 @@ async function getPlan(options) {
     }
   });
   return [plan, Users, Spots, Groups];
-=======
-  return [plan, Users, Spots];
->>>>>>> f7b67b92e950716c5803499b8260369e16da6924
+
   // return await db.Plan.findOne({
   //   where     : options,
   //   attributes: ['id', 'name', 'intro', 'cost', 'status', 'startTime', 'endTime'],
@@ -335,7 +320,6 @@ async function checkPlanOwner(options) {
     raw       : true
   });
 }
-<<<<<<< HEAD
 
 async function getPlanGroups(options) {
   let whereGroupPlan = {
@@ -470,6 +454,3 @@ async function removeGroup(user, options) {
     return Promise.reject('no permission to remove the user of this plan');
   }
 }
-
-=======
->>>>>>> f7b67b92e950716c5803499b8260369e16da6924

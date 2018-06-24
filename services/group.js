@@ -71,7 +71,7 @@ async function getGroup(options) {
       attributes: ['status', 'type']
     }
   });
-<<<<<<< HEAD
+
   let Plans = await group.getPlans({
     raw    : true,
     through: {
@@ -79,9 +79,6 @@ async function getGroup(options) {
     }
   });
   return [group, Users, Plans];
-=======
-  return [group, Users];
->>>>>>> f7b67b92e950716c5803499b8260369e16da6924
   // return await db.Group.findOne({
   //   where     : options,
   //   attributes: ['id', 'name', 'intro', 'cost', 'status', 'startTime', 'endTime'],

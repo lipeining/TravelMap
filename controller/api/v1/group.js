@@ -55,7 +55,6 @@ async function getGroup(req, res, next) {
   };
   try {
     // should we check the permission?
-<<<<<<< HEAD
     let [group, Users, Plans] = await groupService.getGroup(options);
     // console.log(group);
     return res.json({
@@ -63,11 +62,6 @@ async function getGroup(req, res, next) {
         group: group, Users: Users, Plans: Plans
       }, code: 0
     });
-=======
-    // let [group, Users, Spots] = await groupService.getGroup(options);
-    // console.log(group);
-    // return res.json({Message: {group: group, Users: Users, Spots: Spots}, code: 0});
->>>>>>> f7b67b92e950716c5803499b8260369e16da6924
   } catch (err) {
     console.log(err);
     return res.json({Message: {err: err}, code: 4});
@@ -101,14 +95,9 @@ async function createGroup(req, res, next) {
   }
 
   let newGroup = {
-<<<<<<< HEAD
     name  : req.body.name || '',
     intro : req.body.intro || '',
-    number: 1
-=======
-    name : req.body.name || '',
-    intro: req.body.intro || ''
->>>>>>> f7b67b92e950716c5803499b8260369e16da6924
+    number: 1,
   };
   try {
     let user  = req.session.user;
@@ -206,11 +195,7 @@ async function delGroup(req, res, next) {
     // let spots = group.spots;
 
     // should we check who can delete the group?
-<<<<<<< HEAD
-    // todo check permission by UserGroup!
-=======
-    // todo check permission by UserPlan!
->>>>>>> f7b67b92e950716c5803499b8260369e16da6924
+
     let count = await groupService.delGroup(options);
     let log   = {
       admin: req.session.user,
