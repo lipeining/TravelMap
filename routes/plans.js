@@ -76,7 +76,11 @@ router.post('/plan', auth.checkLogin,
     }
   }), planCtrl.createPlan);
 
+<<<<<<< HEAD
 //  Plan get users
+=======
+//  Plan remove user
+>>>>>>> f7b67b92e950716c5803499b8260369e16da6924
 router.get('/planusers', auth.checkLogin,
   checkSchema({
     inOut : {
@@ -155,6 +159,7 @@ router.delete('/planuser', auth.checkLogin,
     }
   }), planCtrl.removeUser);
 
+<<<<<<< HEAD
 //  Plan get groups
 router.get('/plangroups', auth.checkLogin,
   checkSchema({
@@ -250,6 +255,8 @@ router.delete('/plangroup', auth.checkLogin,
     }
   }), planCtrl.removeGroup);
 
+=======
+>>>>>>> f7b67b92e950716c5803499b8260369e16da6924
 // update Plan
 router.put('/plan', auth.checkLogin,
   checkSchema({
