@@ -76,7 +76,6 @@ router.post('/plan', auth.checkLogin,
     }
   }), planCtrl.createPlan);
 
-
 //  Plan get users
 
 router.get('/planusers', auth.checkLogin,
@@ -156,7 +155,6 @@ router.delete('/planuser', auth.checkLogin,
       toInt: true,
     }
   }), planCtrl.removeUser);
-
 
 //  Plan get groups
 router.get('/plangroups', auth.checkLogin,
@@ -241,18 +239,141 @@ router.put('/plangroup', auth.checkLogin,
 //  Plan remove group
 router.delete('/plangroup', auth.checkLogin,
   checkSchema({
-    id    : {
+    id     : {
       in   : ['body'],
       isInt: true,
       toInt: true
     },
-    userId: {
+    groupId: {
       in   : ['body'],
       isInt: true,
       toInt: true,
     }
   }), planCtrl.removeGroup);
 
+//  Plan get spots
+router.get('/planspot', auth.checkLogin,
+  checkSchema({
+    inOut : {
+      in   : ['query'],
+      isInt: true,
+      toInt: true
+    },
+    planId: {
+      in   : ['query'],
+      isInt: true,
+      toInt: true,
+    }
+  }), planCtrl.getPlanSpots);
+
+//  Plan add spot
+router.post('/planspot', auth.checkLogin,
+  checkSchema({
+    planId   : {
+      in   : ['body'],
+      isInt: true,
+      toInt: true
+    },
+    name     : {
+      in      : ['body'],
+      isLength: {
+        errorMessage: 'name should be in [5,16]',
+        // Multiple options would be expressed as an array
+        options     : {min: 5, max: 16}
+      }
+    },
+    intro    : {
+      in      : ['body'],
+      isLength: {
+        errorMessage: 'introduction should be in [20,120]',
+        // Multiple options would be expressed as an array
+        options     : {min: 20, max: 120}
+      }
+    },
+    cost     : {
+      in   : ['body'],
+      isInt: true,
+      toInt: true
+    },
+    startTime: {
+      in    : ['body'],
+      toDate: true,
+      custom: {
+        options: (value, {req, location, path}) => {
+          // check startTime < endTime!
+          let start = Date.parse(value) || 0;
+          let end   = Date.parse(req.body.endTime) || -1;
+          return (end - start) >= 0;
+        }
+      },
+    },
+    endTime  : {
+      in    : ['body'],
+      toDate: true,
+    },
+    status   : {
+      in   : ['body'],
+      isInt: true,
+      toInt: true
+    },
+    type     : {
+      in   : ['body'],
+      isInt: true,
+      toInt: true
+    },
+    // location
+    location : {
+      in    : ['body'],
+      custom: {
+        options: (value, {req, location, path}) => {
+          // check the location is right?
+          console.log(`lng:${value.lng}-lat:${value.lat}`);
+          return true;
+        }
+      }
+    },
+    // order and userId and groupId
+  }), planCtrl.addSpot);
+
+//  Plan edit spot
+router.put('/planspot', auth.checkLogin,
+  checkSchema({
+    planId: {
+      in   : ['body'],
+      isInt: true,
+      toInt: true
+    },
+    spotId: {
+      in   : ['body'],
+      isInt: true,
+      toInt: true,
+    },
+    status: {
+      in   : ['body'],
+      isInt: true,
+      toInt: true
+    },
+    type  : {
+      in   : ['body'],
+      isInt: true,
+      toInt: true
+    }
+  }), planCtrl.setSpot);
+
+//  Plan remove spot
+router.delete('/planspot', auth.checkLogin,
+  checkSchema({
+    id    : {
+      in   : ['body'],
+      isInt: true,
+      toInt: true
+    },
+    spotId: {
+      in   : ['body'],
+      isInt: true,
+      toInt: true,
+    }
+  }), planCtrl.removeSpot);
 
 // update Plan
 router.put('/plan', auth.checkLogin,

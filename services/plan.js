@@ -3,20 +3,11 @@ const BBPromise = require('bluebird');
 const util      = require('util');
 
 module.exports = {
-  getPlans,
-  getPlanUsers,
-  getPlan,
-  createPlan,
-  updatePlan,
-  updatePlans,
-  delPlan,
-  addUser,
-  setUser,
-  removeUser,
-  getPlanGroups,
-  addGroup,
-  setGroup,
-  removeGroup,
+  getPlans, getPlan,
+  getPlanUsers, createPlan, updatePlan, updatePlans, delPlan,
+  addUser, setUser, removeUser,
+  getPlanGroups, addGroup, setGroup, removeGroup,
+  getPlanSpots, addSpot, setSpot, removeSpot,
 };
 
 async function getPlans(options) {
@@ -449,8 +440,111 @@ async function removeGroup(user, options) {
       where: {id: options.id}
     });
     // still use addUsers to update the type and status
-    return await plan.removeUsers([options.userId]);
+    return await plan.removeGroups([options.groupId]);
   } else {
-    return Promise.reject('no permission to remove the user of this plan');
+    return Promise.reject('no permission to remove the group of this plan');
+  }
+}
+
+async function getPlanSpots(options) {
+  let wherePlanSpot = {
+    planId: options.planId
+  };
+  let spotIds       = await db.PlanSpot.findAll({
+    where     : wherePlanSpot,
+    attributes: ['spotId'],
+    raw       : true
+  }).map(function (PlanSpot) {
+    return PlanSpot.spotId;
+  });
+
+  let whereSpot = {};
+  if (options.inOut) {
+    // find the user in the plan
+    whereSpot['id'] = {
+      [db.Sequelize.Op.in]: spotIds,
+    };
+  } else {
+    // find the user not in the plan
+    whereSpot['id'] = {
+      [db.Sequelize.Op.notIn]: spotIds
+    };
+  }
+  return await db.Spot.findAll({
+    attributes: ['id', 'name', 'intro'],
+    raw       : true,
+    where     : whereSpot
+  });
+}
+
+async function addSpot(user, options) {
+  let permission = await checkPlanOwner({
+    userId: user.id,
+    planId: options.planId
+  }) || {};
+  if (permission.id) {
+    let plan    = await db.Plan.findOne({
+      where: {id: options.planId}
+    });
+    // create the spot
+    const point = {
+      type       : 'Point',
+      coordinates: [options.location.lng, options.location.lat]
+    };
+    let spot    = await plan.createSpot({
+      // here is the value object!
+      name   : options.name, intro: options.intro,
+      cost   : options.cost, startTime: options.startTime,
+      endTime: options.endTime, location: point,
+      // the location is different!
+    }, {
+      through: {
+        userId : user.id,
+        groupId: 0,
+        type   : options.type,
+        status : options.status,
+        // order is todo
+      }
+    });
+    return true;
+  } else {
+    return Promise.reject('no permission to add spot to this plan');
+  }
+}
+
+async function setSpot(user, options) {
+  let permission = await checkPlanOwner({
+    userId: user.id,
+    planId: options.planId
+  }) || {};
+  if (permission.id) {
+    let plan = await db.Plan.findOne({
+      where: {id: options.planId}
+    });
+    // still use addGroups to update the type and status
+    return await plan.addSpots([options.spotId], {
+      through: {
+        type  : options.type,
+        status: options.status
+      }
+    });
+  } else {
+    return Promise.reject('no permission to set the spot of this plan');
+  }
+}
+
+async function removeSpot(user, options) {
+  let permission = await checkPlanOwner({
+    userId: user.id,
+    planId: options.id
+  }) || {};
+  if (permission.id) {
+    let plan = await db.Plan.findOne({
+      where: {id: options.id}
+    });
+    // still use addUsers to update the type and status
+    return await plan.removeSpots([options.spotId]);
+  } else {
+    return Promise.reject('no permission to remove the spot of this plan');
   }
 }

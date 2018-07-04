@@ -6,20 +6,11 @@ const path        = require('path');
 const {validationResult} = require('express-validator/check');
 
 module.exports = {
-  getPlans,
-  getPlanUsers,
-  getPlan,
-  createPlan,
-  updatePlan,
-  updatePlans,
-  delPlan,
-  addUser,
-  setUser,
-  removeUser,
-  addGroup,
-  setGroup,
-  removeGroup,
-  getPlanGroups,
+  getPlans, getPlan,
+  getPlanUsers, createPlan, updatePlan, updatePlans, delPlan,
+  addUser, setUser, removeUser,
+  addGroup, setGroup, removeGroup, getPlanGroups,
+  addSpot, setSpot, removeSpot, getPlanSpots,
 };
 
 async function getPlans(req, res, next) {
@@ -357,7 +348,7 @@ async function setGroup(req, res, next) {
     // (todo we can change userId into array)
     let user   = req.session.user;
     let result = await planService.setGroup(user, options);
-    return res.json({code: 0, Message: {result:result}});
+    return res.json({code: 0, Message: {result: result}});
   } catch (err) {
     console.log(err);
     return res.json({Message: {err: err}, code: 4});
@@ -371,13 +362,104 @@ async function removeGroup(req, res, next) {
   }
 
   let options = {
-    id    : parseInt(req.body.id) || 0,
-    userId: parseInt(req.body.userId) || 0,
+    id     : parseInt(req.body.id) || 0,
+    groupId: parseInt(req.body.groupId) || 0,
   };
   try {
     // (todo we can change userId into array)
     let user   = req.session.user;
-    let result = await planService.removeUser(user, options);
+    let result = await planService.removeGroup(user, options);
+    return res.json({code: 0, Message: {}});
+  } catch (err) {
+    console.log(err);
+    return res.json({Message: {err: err}, code: 4});
+  }
+}
+
+async function getPlanSpots(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({Message: {err: errors.array()}, code: 4});
+  }
+
+  // get the user names which is in this plan or not through inOut
+  let options = {
+    planId: parseInt(req.query.planId) || 0,
+    inOut : parseInt(req.query.inOut) || 0,
+  };
+  try {
+    let spotNames = await planService.getPlanSpots(options);
+    return res.json({Message: {spotNames: spotNames}, code: 0});
+  } catch (err) {
+    console.log(err);
+    return res.json({Message: {err: err}, code: 4});
+  }
+}
+
+async function addSpot(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({Message: {err: errors.array()}, code: 4});
+  }
+
+  let options = {
+    planId   : parseInt(req.body.planId) || 0,
+    cost     : parseInt(req.body.cost) || 0,
+    type     : parseInt(req.body.type) || 0,
+    status   : parseInt(req.body.status) || 0,
+    name     : req.body.name || '',
+    intro    : req.body.intro || '',
+    location : req.body.location,
+    startTime: req.body.startTime,
+    endTime  : req.body.endTime
+  };
+  try {
+    let user   = req.session.user;
+    let result = await planService.addSpot(user, options);
+    return res.json({code: 0, Message: {result: result}});
+  } catch (err) {
+    console.log(err);
+    return res.json({Message: {err: err}, code: 4});
+  }
+}
+
+async function setSpot(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({Message: {err: errors.array()}, code: 4});
+  }
+
+  let options = {
+    spotId: parseInt(req.body.spotId) || 0,
+    planId: parseInt(req.body.planId) || 0,
+    type  : parseInt(req.body.type) || 0,
+    status: parseInt(req.body.status) || 0,
+  };
+  try {
+    // (todo we can change userId into array)
+    let user   = req.session.user;
+    let result = await planService.setSpot(user, options);
+    return res.json({code: 0, Message: {result: result}});
+  } catch (err) {
+    console.log(err);
+    return res.json({Message: {err: err}, code: 4});
+  }
+}
+
+async function removeSpot(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({Message: {err: errors.array()}, code: 4});
+  }
+
+  let options = {
+    id    : parseInt(req.body.id) || 0,
+    spotId: parseInt(req.body.spotId) || 0,
+  };
+  try {
+    // (todo we can change userId into array)
+    let user   = req.session.user;
+    let result = await planService.removeSpot(user, options);
     return res.json({code: 0, Message: {}});
   } catch (err) {
     console.log(err);
