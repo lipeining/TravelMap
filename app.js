@@ -10,6 +10,7 @@ var indexRouter  = require('./routes/index');
 var usersRouter  = require('./routes/users');
 var logsRouter   = require('./routes/logs');
 var plansRouter  = require('./routes/plans');
+var spotsRouter  = require('./routes/spots');
 var groupsRouter = require('./routes/groups');
 
 var app = express();
@@ -53,6 +54,7 @@ app.use('/', indexRouter);
 app.use('/api/v1/', usersRouter);
 // app.use('/api/v1/', logsRouter);
 app.use('/api/v1/', plansRouter);
+app.use('/api/v1/', spotsRouter);
 app.use('/api/v1/', groupsRouter);
 
 // catch 404 and forward to error handler
